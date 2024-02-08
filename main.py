@@ -17,11 +17,11 @@ if __name__ == '__main__':
         conn.commit()  # todo: create UnitOfWork
         fill_tables(psq_adapter)
         conn.commit()  # todo: create UnitOfWork
-        result = get_data_recursive(psq_adapter, ['dir'])
+        result = get_data_recursive(psq_adapter, ['dir', '4'])
         print('result - ', result)
 
     with ArangoAdapter(ArangoClient(hosts=f'http://{arango_settings.host}:{arango_settings.port}')) as arango_adapter:
         create_collections(arango_adapter)
         fill_collections(arango_adapter)
-        result = get_arango_data(arango_adapter, name='dir_3')
+        result = get_arango_data(arango_adapter, name='dir')
         print('result - ', result)

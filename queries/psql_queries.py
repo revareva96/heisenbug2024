@@ -25,14 +25,16 @@ create_edges = """
 
 get_recursive_data = """
     with recursive 
-    in_dirs(id) as (
-        select id from dirs where name = %s
+    in_dirs(id, depth) as (
+        select id, 1
+        from dirs where name = %s
         union 
-        select e.tail_id from edges_dirs as e
-        join in_dirs e_dirs
-        on e.head_id = e_dirs.id
+        select e.tail_id, in_dirs.depth + 1 from edges_dirs as e
+        join in_dirs
+        on e.head_id = in_dirs.id
+        where in_dirs.depth < %s
     )
-    select dirs.name from in_dirs
+    select dirs.name, in_dirs.depth from in_dirs
     join dirs
-    on in_dirs.id = dirs.id;
+    on in_dirs.id = dirs.id
 """

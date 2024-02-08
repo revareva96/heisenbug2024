@@ -2,11 +2,11 @@ from typing import Any
 
 from psycopg2.extensions import AsIs
 
-from config.settings import PostgresSettings
+from config.settings import get_postgesql_settings
 from queries.psql_queries import create_dirs, create_edges, table_exist, get_recursive_data
 from repository.adapters import PSqlAdapter
 
-settings = PostgresSettings()
+settings = get_postgesql_settings()
 schema = settings.schema
 
 
@@ -25,7 +25,7 @@ def fill_tables(psql_adapter: PSqlAdapter) -> None:
         return
     query_dirs = f'insert into {schema}.dirs (name) values '
     query_edges = f'insert into {schema}.edges_dirs (head_id, tail_id) values '
-    root_dir_name = "'.root'"
+    root_dir_name = "'dir'"
     _id = 1
     query_dirs += f'({root_dir_name})'
     base_dir_name = "dir"
@@ -45,5 +45,7 @@ def fill_tables(psql_adapter: PSqlAdapter) -> None:
     psql_adapter.execute(query=query_edges[:-2])
 
 
-def get_data_recursive(psql_adapter: PSqlAdapter, format_vars: list[str] = ['.root']) -> list[Any]:
+def get_data_recursive(psql_adapter: PSqlAdapter, format_vars=None) -> list[Any]:
+    if format_vars is None:
+        format_vars = ['.root', '2']
     return psql_adapter.get(query=get_recursive_data, format_vars=format_vars)
